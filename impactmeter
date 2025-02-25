@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard para el Concurso de Remix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="url"], textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .progress-bar {
+            margin-top: 20px;
+            position: relative;
+            width: 100%;
+            height: 40px;
+        }
+        .progress-bar .bar {
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to right, #00f, #0f0, #ff0, #f00); /* Gradiente de colores */
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: #f00; /* Color inicial */
+            transition: width 0.3s ease;
+        }
+        .progress-bar .scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #333;
+        }
+        .progress-bar .scale span {
+            position: relative;
+            bottom: -5px; /* Ajuste vertical */
+        }
+        .progress-bar .indicator {
+            position: absolute;
+            bottom: -30px; /* Distancia entre el triángulo y la barra */
+            left: 0;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: left 0.3s ease;
+        }
+        .progress-bar .indicator .triangle {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 10px 10px 10px;
+            border-color: transparent transparent #000 transparent;
+        }
+        .progress-bar .indicator .score-label {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+        }
+        .public-scores {
+            margin-top: 100px; /* Espacio entre la barra y la tabla */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Efecto de confeti */
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        .confetti {
+            position: fixed;
+            top: -100vh;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: confetti-fall 5s linear forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Formulario de Puntuación</h1>
+        <form id="actionForm">
+            <!-- User Identification -->
+            <label for="username">Nombre de Usuario:</label>
+            <input type="text" id="username" name="username">
+
+            <!-- Admin Configurable Deadline -->
+            <label for="deadline">Fecha Límite (Configurada por Admin):</label>
+            <input type="text" id="deadline" value="2025-12-31" readonly>
+
+            <!-- Activity Details -->
+            <label for="activityTitle">Título de la Actividad:</label>
+            <input type="text" id="activityTitle" name="activityTitle" placeholder="Logro 1 - Colabora en la comunidad">
+
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" rows="3" placeholder="Indica lo que has logrado"></textarea>
+
+            <!-- Verification Data -->
+            <label for="verificationLink">Enlace de Verificación (Público):</label>
+            <input type="url" id="verificationLink" name="verificationLink" placeholder="URL de comprobación">
+
+            <!-- Submit Button -->
+            <input type="submit" value="Enviar">
+        </form>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="bar">
+                <div class="fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+            <div class="scale">
+                <span>1</span><span style="margin-left: 9.5%;">3</span><span style="margin-left: 9.5%;">5</span>
+                <span style="margin-left: 9.5%;">7</span><span style="margin-left: 9.5%;">10</span>
+            </div>
+            <div class="indicator" id="progressIndicator" style="left: 0;">
+                <div class="triangle"></div>
+                <div class="score-label" id="scoreLabel">0</div>
+            </div>
+        </div>
+
+        <!-- Public Scores Table -->
+        <div class="public-scores">
+            <h2>Puntuaciones Públicas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Impact</th>
+                        <th>Score</th>
+                        <th>Verification</th>
+                    </tr>
+                </thead>
+                <tbody id="publicScoresTable">
+                    <!-- Scores will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Message after submission -->
+        <div class="message" id="thankYouMessage" style="display: none;">
+            ¡Gracias por tus buenas acciones! Tu progreso se ha actualizado.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const actionForm = document.getElementById('actionForm');
+            if (!actionForm) {
+                console.error("El formulario con ID 'actionForm' no fue encontrado en el DOM.");
+                return;
+            }
+
+            const progressFill = document.getElementById('progressFill');
+            const progressIndicator = document.getElementById('progressIndicator');
+            const scoreLabel = document.getElementById('scoreLabel');
+
+            // ADMIN: Define aquí las palabras clave y sus reglas de puntuación
+            const validKeywords = [
+                { 
+                    titleKeyword: "Colabora", // ADMIN: Palabra clave 1
+                    points: {
+                        username: 1, // ADMIN: Puntos por nombre de usuario
+                        descriptionWords: {
+                            minWords: 11, // ADMIN: Número mínimo de palabras en la descripción
+                            pointsForMinWords: 1, // ADMIN: Puntos si hay más de minWords
+                            pointsForLessWords: 0.5 // ADMIN: Puntos si hay menos de minWords
+                        },
+                        verificationLink: 0.5 // ADMIN: Puntos por enlace de verificación
+                    }
+                },
+                { 
+                    titleKeyword: "Crea", // ADMIN: Palabra clave 2
+                    points: {
+                        username: 1, // ADMIN: Puntos por nombre de usuario
+                        descriptionWords: {
+                            minWords: 20, // ADMIN: Número mínimo de palabras en la descripción
+                            pointsForMinWords: 1, // ADMIN: Puntos si hay más de minWords
+                            pointsForLessWords: 0.5 // ADMIN: Puntos si hay menos de minWords
+                        },
+                        verificationLink: 1 // ADMIN: Puntos por enlace de verificación
+                    }
+                },
+                { 
+                    titleKeyword: "Comparte", // ADMIN: Palabra clave 3
+                    points: {
+                        username: 0.5, // ADMIN: Puntos por nombre de usuario
+                        descriptionWords: {
+                            minWords: 15, // ADMIN: Número mínimo de palabras en la descripción
+                            pointsForMinWords: 1, // ADMIN: Puntos si hay más de minWords
+                            pointsForLessWords: 0.5 // ADMIN: Puntos si hay menos de minWords
+                        },
+                        verificationLink: 1 // ADMIN: Puntos por enlace de verificación
+                    }
+                }
+            ];
+
+            let attemptsLeft = 3; // ADMIN: Número de intentos permitidos
+
+            actionForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const deadlineInput = document.getElementById('deadline');
+                const deadlineStr = deadlineInput.value || "2025-12-31";
+                const deadlineDate = new Date(deadlineStr);
+
+                const currentDate = new Date();
+                if (currentDate > deadlineDate) {
+                    alert("La fecha límite ha expirado. No puedes enviar más acciones.");
+                    return;
+                }
+
+                const formData = new FormData(this);
+                const username = formData.get('username') || 'Anónimo';
+                const activityTitle = formData.get('activityTitle') || '';
+                const description = formData.get('description') || '';
+                const verificationLink = formData.get('verificationLink') || '';
+
+                // Validar palabra específica en el título
+                const matchingKeyword = validKeywords.find(keyword => 
+                    activityTitle.toLowerCase().includes(keyword.titleKeyword.toLowerCase())
+                );
+
+                if (!matchingKeyword) {
+                    if (attemptsLeft > 0) {
+                        attemptsLeft--;
+                        alert(`Tu título debe incluir una palabra específica. Te quedan ${attemptsLeft} intentos.`);
+                        return;
+                    } else {
+                        alert("Has agotado tus intentos para esta acción. Por favor, inténtalo de nuevo más tarde.");
+                        return;
+                    }
+                }
+
+                // Verificar si el enlace de verificación ya existe en cualquier registro
+                if (isVerificationLinkUsed(verificationLink)) {
+                    alert("Este enlace de verificación ya ha sido registrado. Debes proporcionar uno diferente.");
+                    return;
+                }
+
+                // Obtener el puntaje total actual del usuario
+                const userTotalScore = getUserTotalScore(username);
+
+                // Calcular puntos basados en la palabra clave
+                const pointsConfig = matchingKeyword.points;
+                let pointsForAction = 0;
+
+                // Puntos por nombre de usuario
+                if (username.trim() !== '') {
+                    pointsForAction += pointsConfig.username;
+                }
+
+                // Puntos por descripción
+                const wordCount = description.trim().split(' ').length;
+                if (wordCount >= pointsConfig.descriptionWords.minWords) {
+                    pointsForAction += pointsConfig.descriptionWords.pointsForMinWords;
+                } else if (wordCount > 0) {
+                    pointsForAction += pointsConfig.descriptionWords.pointsForLessWords;
+                }
+
+                // Puntos por enlace de verificación
+                if (verificationLink.trim() !== '') {
+                    pointsForAction += pointsConfig.verificationLink;
+                }
+
+                // Mostrar confeti si alcanza la puntuación máxima de la acción
+                const maxActionScore = pointsConfig.username + pointsConfig.descriptionWords.pointsForMinWords + pointsConfig.verificationLink;
+                if (pointsForAction >= maxActionScore) {
+                    showConfetti();
+                }
+
+                // Determinar el estado (Impact)
+                const impactStatus = pointsForAction >= 2.5 ? "Excelente" : pointsForAction >= 2 ? "Bueno" : "Pobre";
+
+                // Crear nueva fila en la tabla de puntuaciones públicas
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${username}</td>
+                    <td>${impactStatus}</td>
+                    <td>${pointsForAction.toFixed(1)}</td>
+                    <td><a href="${verificationLink}" target="_blank">${verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
+                `;
+                document.getElementById('publicScoresTable').appendChild(newRow);
+
+                // Actualizar la barra de progreso con el puntaje total del usuario
+                updateProgressBar(userTotalScore + pointsForAction);
+
+                // Mostrar mensaje de agradecimiento
+                const thankYouMessage = document.getElementById('thankYouMessage');
+                thankYouMessage.style.display = 'block';
+                setTimeout(() => {
+                    thankYouMessage.style.display = 'none';
+                }, 5000); // Ocultar después de 5 segundos
+
+                this.reset(); // Reiniciar el formulario
+            });
+
+            // Función para obtener el puntaje total de un usuario
+            function getUserTotalScore(username) {
+                const rows = document.querySelectorAll('#publicScoresTable tr');
+                let totalScore = 0;
+                for (const row of rows) {
+                    const usernameCell = row.querySelector('td:nth-child(1)');
+                    const scoreCell = row.querySelector('td:nth-child(3)');
+                    if (usernameCell && scoreCell && usernameCell.textContent === username) {
+                        totalScore += parseFloat(scoreCell.textContent);
+                    }
+                }
+                return totalScore;
+            }
+
+            // Función para verificar si un enlace de verificación ya ha sido registrado
+            function isVerificationLinkUsed(verificationLink) {
+                const rows = document.querySelectorAll('#publicScoresTable tr');
+                for (const row of rows) {
+                    const linkCell = row.querySelector('td:nth-child(4) a');
+                    if (linkCell && linkCell.href === verificationLink) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // Función para actualizar la barra de progreso
+            function updateProgressBar(score) {
+                const maxScore = 9; // ADMIN: Puntaje máximo permitido
+                const percentage = Math.min(100, Math.max(0, score / maxScore * 100)); // Limitar entre 0% y 100%
+                progressFill.style.width = `${percentage}%`;
+                progressIndicator.style.left = `${percentage}%`;
+                scoreLabel.textContent = score.toFixed(1);
+                progressFill.style.backgroundColor = getTemperatureColor(percentage);
+            }
+
+            // Función para obtener el color según el puntaje
+            function getTemperatureColor(percentage) {
+                if (percentage >= 70) return '#f00'; // Rojo (caliente)
+                if (percentage >= 50) return '#ff0'; // Amarillo
+                if (percentage >= 30) return '#0f0'; // Verde
+                return '#00f'; // Azul (frío)
+            }
+
+            // Función para mostrar efecto de confeti
+            function showConfetti() {
+                const confettiContainer = document.createElement('div');
+                confettiContainer.className = 'confetti';
+
+                for (let i = 0; i < 100; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.left = `${Math.random() * 100}vw`;
+                    piece.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                    piece.style.width = `${Math.random() * 10 + 5}px`;
+                    piece.style.height = `${Math.random() * 10 + 5}px`;
+                    piece.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                    confettiContainer.appendChild(piece);
+                }
+
+                document.body.appendChild(confettiContainer);
+
+                setTimeout(() => {
+                    confettiContainer.remove();
+                }, 5000); // Eliminar confeti después de 5 segundos
+            }
+
+            updateProgressBar(0); // Inicializar la barra de progreso en 0
+        });
+    </script>
+</body>
+</html>
