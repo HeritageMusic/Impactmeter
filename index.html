@@ -21,62 +21,74 @@
             margin: auto;
             background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 20px;
         }
         form {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         label {
             margin-bottom: 8px;
             font-weight: bold;
+            width: 100%;
+            text-align: left;
         }
         input[type="text"], input[type="url"], textarea {
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 14px;
         }
         input[type="submit"] {
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             background-color: #007BFF;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
+
+        /* Estilo para la barra de temperatura */
         .progress-bar {
             margin-top: 20px;
             position: relative;
             width: 100%;
-            height: 40px;
+            height: 50px;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.1);
         }
         .progress-bar .bar {
-            width: 100%;
-            height: 20px;
+            height: 100%;
             background: linear-gradient(to right, #00f, #0f0, #ff0, #f00); /* Gradiente de colores */
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
+            border-radius: 25px;
         }
         .progress-bar .fill {
             height: 100%;
             background: #f00; /* Color inicial */
             transition: width 0.3s ease;
+            border-radius: 25px;
         }
         .progress-bar .scale {
             display: flex;
             justify-content: space-between;
-            margin-top: 5px;
-            font-size: 12px;
+            margin-top: 10px;
+            font-size: 14px;
             color: #333;
         }
         .progress-bar .scale span {
@@ -85,7 +97,7 @@
         }
         .progress-bar .indicator {
             position: absolute;
-            bottom: -30px; /* Distancia entre el triángulo y la barra */
+            bottom: -40px; /* Distancia entre el triángulo y la barra */
             left: 0;
             transform: translateX(-50%);
             display: flex;
@@ -97,30 +109,40 @@
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 0 10px 10px 10px;
+            border-width: 0 12px 12px 12px;
             border-color: transparent transparent #000 transparent;
         }
         .progress-bar .indicator .score-label {
             margin-top: 5px;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             color: #000;
         }
+
+        /* Estilo para la tabla pública */
         .public-scores {
-            margin-top: 100px; /* Espacio entre la barra y la tabla */
+            margin-top: 100px;
+            width: 100%;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
-            padding: 8px;
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f9f9f9;
+            color: #333;
         }
         a {
             color: #007BFF;
             text-decoration: none;
+            font-weight: bold;
         }
         a:hover {
             text-decoration: underline;
@@ -131,56 +153,30 @@
             font-size: 16px;
             color: #333;
         }
-
-        /* Efecto de confeti */
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh);
-                opacity: 0;
-            }
-        }
-        .confetti {
-            position: fixed;
-            top: -100vh;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 1000;
-        }
-        .confetti-piece {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            animation: confetti-fall 5s linear forwards;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Formulario de Puntuación</h1>
+        <h1>EL IMPACTOMETRO</h1>
+
         <form id="actionForm">
             <!-- User Identification -->
-            <label for="username">Nombre de Usuario:</label>
-            <input type="text" id="username" name="username">
+          <label for="username">Nombre de Usuario:</label>
+            <input type="text" id="username" name="username" placeholder="Ingresa tu nombre">
 
-            <!-- Admin Configurable Deadline -->
-            <label for="deadline">Fecha Límite (Configurada por Admin):</label>
-            <input type="text" id="deadline" value="2025-12-31" readonly>
+            <!-- Deadline Configurable by Admin -->
+            <label for="deadline">Fecha Límite:</label>
+            <input type="text" id="deadline" value="2025-03-10" readonly style="background-color: #f9f9f9;"> <!-- ADMIN: FECHA LÍMITE DEL PROTOTIPO PONER AQUI "YYYY-MM-DD" -->
 
-            <!-- Activity Details -->
-            <label for="activityTitle">Título de la Actividad:</label>
-            <input type="text" id="activityTitle" name="activityTitle" placeholder="Logro 1 - Colabora en la comunidad">
+            <!-- Activity Title -->
+            <label for="activityTitle">Título de la Buena Acción:</label>
+            <input type="text" id="activityTitle" name="activityTitle" placeholder="Ingresa un título único"> <!-- ADMIN: EL TÍTULO DEBE INCLUIR LA PALABRA CLAVE SECRETA -->
 
+            <!-- Description -->
             <label for="description">Descripción:</label>
-            <textarea id="description" name="description" rows="3" placeholder="Indica lo que has logrado"></textarea>
+            <textarea id="description" name="description" rows="4" placeholder="Describe lo que has logrado"></textarea>
 
-            <!-- Verification Data -->
+            <!-- Verification Link -->
             <label for="verificationLink">Enlace de Verificación (Público):</label>
             <input type="url" id="verificationLink" name="verificationLink" placeholder="URL de comprobación">
 
@@ -194,12 +190,12 @@
                 <div class="fill" id="progressFill" style="width: 0%;"></div>
             </div>
             <div class="scale">
-                <span>1</span><span style="margin-left: 9.5%;">3</span><span style="margin-left: 9.5%;">5</span>
-                <span style="margin-left: 9.5%;">7</span><span style="margin-left: 9.5%;">10</span>
+                <span>0.00</span><span style="margin-left: 11%;">0.25</span><span style="margin-left: 11%;">0.50</span>
+                <span style="margin-left: 11%;">0.75</span><span style="margin-left: 11%;">1.00</span>
             </div>
             <div class="indicator" id="progressIndicator" style="left: 0;">
                 <div class="triangle"></div>
-                <div class="score-label" id="scoreLabel">0</div>
+                <div class="score-label" id="scoreLabel">0.00</div> <!-- Mostrar puntaje inicial -->
             </div>
         </div>
 
@@ -239,53 +235,27 @@
             const progressIndicator = document.getElementById('progressIndicator');
             const scoreLabel = document.getElementById('scoreLabel');
 
-            // ADMIN: Define aquí las palabras clave y sus reglas de puntuación
+            // ADMIN: DEFINE AQUÍ LAS PALABRAS CLAVE Y SUS REGLAS DE PUNTUACIÓN
             const validKeywords = [
                 { 
-                    titleKeyword: "Colabora", // ADMIN: Palabra clave 1
+                    titleKeyword: "el ping tag", // ADMIN: PALABRA CLAVE SECRETA PARA VALIDAR EL TÍTULO PONER AQUI "TU_PALABRA_CLAVE"
                     points: {
-                        username: 1, // ADMIN: Puntos por nombre de usuario
+                        username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
+                        activityTitle: 0.25, // ADMIN: PUNTOS POR TÍTULO DE LA BUENA ACCIÓN PONER AQUI 0.25
                         descriptionWords: {
-                            minWords: 11, // ADMIN: Número mínimo de palabras en la descripción
-                            pointsForMinWords: 1, // ADMIN: Puntos si hay más de minWords
-                            pointsForLessWords: 0.5 // ADMIN: Puntos si hay menos de minWords
+                            minWords: 1, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 1
+                            pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
                         },
-                        verificationLink: 0.5 // ADMIN: Puntos por enlace de verificación
-                    }
-                },
-                { 
-                    titleKeyword: "Crea", // ADMIN: Palabra clave 2
-                    points: {
-                        username: 1, // ADMIN: Puntos por nombre de usuario
-                        descriptionWords: {
-                            minWords: 20, // ADMIN: Número mínimo de palabras en la descripción
-                            pointsForMinWords: 1, // ADMIN: Puntos si hay más de minWords
-                            pointsForLessWords: 0.5 // ADMIN: Puntos si hay menos de minWords
-                        },
-                        verificationLink: 1 // ADMIN: Puntos por enlace de verificación
-                    }
-                },
-                { 
-                    titleKeyword: "Comparte", // ADMIN: Palabra clave 3
-                    points: {
-                        username: 0.5, // ADMIN: Puntos por nombre de usuario
-                        descriptionWords: {
-                            minWords: 15, // ADMIN: Número mínimo de palabras en la descripción
-                            pointsForMinWords: 1, // ADMIN: Puntos si hay más de minWords
-                            pointsForLessWords: 0.5 // ADMIN: Puntos si hay menos de minWords
-                        },
-                        verificationLink: 1 // ADMIN: Puntos por enlace de verificación
+                        verificationLink: 0.25 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.25
                     }
                 }
             ];
-
-            let attemptsLeft = 3; // ADMIN: Número de intentos permitidos
 
             actionForm.addEventListener('submit', function (event) {
                 event.preventDefault();
 
                 const deadlineInput = document.getElementById('deadline');
-                const deadlineStr = deadlineInput.value || "2025-12-31";
+                const deadlineStr = deadlineInput.value || "2023-03-10"; // ADMIN: FECHA LÍMITE DEL PROTOTIPO PONER AQUI "YYYY-MM-DD"
                 const deadlineDate = new Date(deadlineStr);
 
                 const currentDate = new Date();
@@ -306,14 +276,14 @@
                 );
 
                 if (!matchingKeyword) {
-                    if (attemptsLeft > 0) {
-                        attemptsLeft--;
-                        alert(`Tu título debe incluir una palabra específica. Te quedan ${attemptsLeft} intentos.`);
-                        return;
-                    } else {
-                        alert("Has agotado tus intentos para esta acción. Por favor, inténtalo de nuevo más tarde.");
-                        return;
-                    }
+                    alert("Tu título debe incluir una palabra secreta válida.");
+                    return;
+                }
+
+                // Verificar si el usuario ya ha enviado esta buena acción
+                if (isUserActionAlreadySubmitted(username, activityTitle)) {
+                    alert("Ya has enviado esta buena acción. No puedes enviarla nuevamente.");
+                    return;
                 }
 
                 // Verificar si el enlace de verificación ya existe en cualquier registro
@@ -321,9 +291,6 @@
                     alert("Este enlace de verificación ya ha sido registrado. Debes proporcionar uno diferente.");
                     return;
                 }
-
-                // Obtener el puntaje total actual del usuario
-                const userTotalScore = getUserTotalScore(username);
 
                 // Calcular puntos basados en la palabra clave
                 const pointsConfig = matchingKeyword.points;
@@ -334,12 +301,15 @@
                     pointsForAction += pointsConfig.username;
                 }
 
+                // Puntos por título de la buena acción
+                if (activityTitle.toLowerCase().includes(pointsConfig.titleKeyword)) {
+                    pointsForAction += pointsConfig.activityTitle;
+                }
+
                 // Puntos por descripción
                 const wordCount = description.trim().split(' ').length;
                 if (wordCount >= pointsConfig.descriptionWords.minWords) {
                     pointsForAction += pointsConfig.descriptionWords.pointsForMinWords;
-                } else if (wordCount > 0) {
-                    pointsForAction += pointsConfig.descriptionWords.pointsForLessWords;
                 }
 
                 // Puntos por enlace de verificación
@@ -347,27 +317,26 @@
                     pointsForAction += pointsConfig.verificationLink;
                 }
 
-                // Mostrar confeti si alcanza la puntuación máxima de la acción
-                const maxActionScore = pointsConfig.username + pointsConfig.descriptionWords.pointsForMinWords + pointsConfig.verificationLink;
-                if (pointsForAction >= maxActionScore) {
-                    showConfetti();
-                }
-
                 // Determinar el estado (Impact)
-                const impactStatus = pointsForAction >= 2.5 ? "Excelente" : pointsForAction >= 2 ? "Bueno" : "Pobre";
+                const impactStatus = pointsForAction === 1 ? "Excelente" : pointsForAction >= 0.75 ? "Muy Bueno" : pointsForAction >= 0.5 ? "Bueno" : "Pobre";
 
                 // Crear nueva fila en la tabla de puntuaciones públicas
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
                     <td>${username}</td>
                     <td>${impactStatus}</td>
-                    <td>${pointsForAction.toFixed(1)}</td>
+                    <td>${pointsForAction.toFixed(2)}</td> <!-- Mostrar puntaje con dos decimales -->
                     <td><a href="${verificationLink}" target="_blank">${verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
                 `;
                 document.getElementById('publicScoresTable').appendChild(newRow);
 
-                // Actualizar la barra de progreso con el puntaje total del usuario
-                updateProgressBar(userTotalScore + pointsForAction);
+                // Mostrar confeti si alcanza la puntuación máxima de la acción
+                if (pointsForAction === 1) {
+                    showConfetti();
+                }
+
+                // Actualizar la barra de temperatura con el puntaje total del usuario
+                updateProgressBar(pointsForAction);
 
                 // Mostrar mensaje de agradecimiento
                 const thankYouMessage = document.getElementById('thankYouMessage');
@@ -379,18 +348,22 @@
                 this.reset(); // Reiniciar el formulario
             });
 
-            // Función para obtener el puntaje total de un usuario
-            function getUserTotalScore(username) {
+            // Función para verificar si un usuario ya ha enviado una buena acción específica
+            function isUserActionAlreadySubmitted(username, activityTitle) {
                 const rows = document.querySelectorAll('#publicScoresTable tr');
-                let totalScore = 0;
                 for (const row of rows) {
                     const usernameCell = row.querySelector('td:nth-child(1)');
-                    const scoreCell = row.querySelector('td:nth-child(3)');
-                    if (usernameCell && scoreCell && usernameCell.textContent === username) {
-                        totalScore += parseFloat(scoreCell.textContent);
+                    const titleCell = row.querySelector('td:nth-child(2)');
+                    if (
+                        usernameCell &&
+                        titleCell &&
+                        usernameCell.textContent === username &&
+                        titleCell.textContent.toLowerCase().includes(activityTitle.toLowerCase())
+                    ) {
+                        return true;
                     }
                 }
-                return totalScore;
+                return false;
             }
 
             // Función para verificar si un enlace de verificación ya ha sido registrado
@@ -405,21 +378,21 @@
                 return false;
             }
 
-            // Función para actualizar la barra de progreso
+            // Función para actualizar la barra de temperatura
             function updateProgressBar(score) {
-                const maxScore = 9; // ADMIN: Puntaje máximo permitido
-                const percentage = Math.min(100, Math.max(0, score / maxScore * 100)); // Limitar entre 0% y 100%
+                const maxScore = 1; // Rango máximo de la barra de temperatura
+                const percentage = Math.min(100, Math.max(0, score / maxScore * 100)); // Convertir puntaje a porcentaje
                 progressFill.style.width = `${percentage}%`;
                 progressIndicator.style.left = `${percentage}%`;
-                scoreLabel.textContent = score.toFixed(1);
+                scoreLabel.textContent = score.toFixed(2); // Mostrar puntaje con dos decimales
                 progressFill.style.backgroundColor = getTemperatureColor(percentage);
             }
 
             // Función para obtener el color según el puntaje
             function getTemperatureColor(percentage) {
-                if (percentage >= 70) return '#f00'; // Rojo (caliente)
+                if (percentage >= 75) return '#f00'; // Rojo (caliente)
                 if (percentage >= 50) return '#ff0'; // Amarillo
-                if (percentage >= 30) return '#0f0'; // Verde
+                if (percentage >= 25) return '#0f0'; // Verde
                 return '#00f'; // Azul (frío)
             }
 
@@ -446,7 +419,7 @@
                 }, 5000); // Eliminar confeti después de 5 segundos
             }
 
-            updateProgressBar(0); // Inicializar la barra de progreso en 0
+            updateProgressBar(0); // Inicializar la barra de temperatura en 0.00
         });
     </script>
 </body>
