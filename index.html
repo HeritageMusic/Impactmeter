@@ -161,7 +161,7 @@
 
         <form id="actionForm">
             <!-- User Identification -->
-          <label for="username">Nombre de Usuario:</label>
+            <label for="username">Nombre de Usuario:</label>
             <input type="text" id="username" name="username" placeholder="Ingresa tu nombre">
 
             <!-- Deadline Configurable by Admin -->
@@ -170,7 +170,7 @@
 
             <!-- Activity Title -->
             <label for="activityTitle">Título de la Buena Acción:</label>
-            <input type="text" id="activityTitle" name="activityTitle" placeholder="Nombre de la buena acción"> <!-- ADMIN: EL TÍTULO DEBE SER PROGRAMADO POR EL ADMIN -->
+            <input type="text" id="activityTitle" name="activityTitle" placeholder="Título de la buena acción"> <!-- ADMIN: EL TÍTULO DEBE SER PROGRAMADO POR EL ADMIN -->
 
             <!-- Description -->
             <label for="description">Descripción:</label>
@@ -207,7 +207,7 @@
                     <tr>
                         <th>User</th>
                         <th>Título</th>
-                      <th>Impact</th>
+                        <th>Impact</th>
                         <th>Score</th>
                         <th>Verification</th>
                     </tr>
@@ -250,7 +250,7 @@
                     }
                 },
                 { 
-                    title: "El Ping Tag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
+                    title: "el ping tag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
                     pointsConfig: {
                         username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
                         descriptionWords: {
@@ -272,6 +272,52 @@
                     }
                 }
             ];
+
+            // Cargar puntuaciones públicas desde localStorage
+            function loadPublicScores() {
+                const savedScores = JSON.parse(localStorage.getItem('publicScores')) || [];
+                const publicScoresTable = document.getElementById('publicScoresTable');
+                publicScoresTable.innerHTML = ''; // Limpiar la tabla antes de cargar los datos
+
+                savedScores.forEach(score => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${score.username}</td>
+                        <td>${score.activityTitle}</td>
+                        <td>${score.impactStatus}</td>
+                        <td>${score.points.toFixed(2)}</td>
+                        <td><a href="${score.verificationLink}" target="_blank">${score.verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
+                    `;
+                    publicScoresTable.appendChild(newRow);
+                });
+            }
+
+            // Guardar puntuaciones públicas en localStorage
+            function savePublicScores(scores) {
+                localStorage.setItem('publicScores', JSON.stringify(scores));
+            }
+
+            // Obtener todas las puntuaciones públicas actuales
+            function getPublicScores() {
+                return JSON.parse(localStorage.getItem('publicScores')) || [];
+            }
+
+            // Verificar si un usuario ya ha enviado una buena acción específica
+            function isUserActionAlreadySubmitted(username, activityTitle) {
+                const scores = getPublicScores();
+                return scores.some(score => 
+                    score.username.toLowerCase().trim() === username.toLowerCase().trim() &&
+                    score.activityTitle.toLowerCase().trim() === activityTitle.toLowerCase().trim()
+                );
+            }
+
+            // Verificar si un enlace de verificación ya existe en cualquier registro
+            function isVerificationLinkUsed(verificationLink) {
+                const scores = getPublicScores();
+                return scores.some(score => score.verificationLink === verificationLink);
+            }
+
+            loadPublicScores(); // Cargar puntuaciones al iniciar la aplicación
 
             actionForm.addEventListener('submit', function (event) {
                 event.preventDefault();
@@ -341,79 +387,37 @@
                 const impactStatus = pointsForAction === 1 ? "Excelente" : pointsForAction >= 0.75 ? "Muy Bueno" : pointsForAction >= 0.5 ? "Bueno" : "Pobre";
 
                 // Crear nueva fila en la tabla de puntuaciones públicas
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td>${username}</td>
-                    <td>${activityTitle}</td>
-                    <td>${impactStatus}</td>
-                    <td>${pointsForAction.toFixed(2)}</td> <!-- Mostrar puntaje con dos decimales -->
-                    <td><a href="${verificationLink}" target="_blank">${verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
-                `;
-                document.getElementById('publicScoresTable').appendChild(newRow);
+                const newRow = {
+                    username,
+                    activityTitle,
+                    impactStatus,
+                    points: pointsForAction.toFixed(2),
+                    verificationLink
+                };
 
-                // Actualizar la barra de temperatura con el puntaje obtenido
-                updateProgressBar(pointsForAction);
+                // Guardar la nueva puntuación en localStorage
+                const publicScores = getPublicScores();
+                publicScores.push(newRow);
+                savePublicScores(publicScores);
+
+                // Actualizar la tabla pública
+                const publicScoresTable = document.getElementById('publicScoresTable');
+                const rowElement = document.createElement('tr');
+                rowElement.innerHTML = `
+                    <td>${newRow.username}</td>
+                    <td>${newRow.activityTitle}</td>
+                    <td>${newRow.impactStatus}</td>
+                    <td>${newRow.points}</td>
+                    <td><a href="${newRow.verificationLink}" target="_blank">${newRow.verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
+                `;
+                publicScoresTable.appendChild(rowElement);
+
+                // Mostrar confeti si alcanza la puntuación máxima de la acción
+                if (pointsForAction === 1) {
+                    showConfetti();
+                }
 
                 // Mostrar mensaje de agradecimiento
                 const thankYouMessage = document.getElementById('thankYouMessage');
                 thankYouMessage.style.display = 'block';
-                setTimeout(() => {
-                    thankYouMessage.style.display = 'none';
-                }, 5000); // Ocultar después de 5 segundos
-
-                this.reset(); // Reiniciar el formulario
-            });
-
-            // Función para verificar si un usuario ya ha enviado una buena acción específica
-            function isUserActionAlreadySubmitted(username, activityTitle) {
-                const rows = document.querySelectorAll('#publicScoresTable tr');
-                for (const row of rows) {
-                    const usernameCell = row.querySelector('td:nth-child(1)');
-                    const titleCell = row.querySelector('td:nth-child(2)');
-                    if (
-                        usernameCell &&
-                        titleCell &&
-                        usernameCell.textContent === username &&
-                        titleCell.textContent.toLowerCase().trim() === activityTitle.toLowerCase().trim()
-                    ) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            // Función para verificar si un enlace de verificación ya ha sido registrado
-            function isVerificationLinkUsed(verificationLink) {
-                const rows = document.querySelectorAll('#publicScoresTable tr');
-                for (const row of rows) {
-                    const linkCell = row.querySelector('td:nth-child(5) a');
-                    if (linkCell && linkCell.href === verificationLink) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            // Función para actualizar la barra de temperatura
-            function updateProgressBar(score) {
-                const maxScore = 1; // Rango máximo de la barra de temperatura
-                const percentage = Math.min(100, Math.max(0, score / maxScore * 100)); // Convertir puntaje a porcentaje
-                progressFill.style.width = `${percentage}%`;
-                progressIndicator.style.left = `${percentage}%`;
-                scoreLabel.textContent = score.toFixed(2); // Mostrar puntaje con dos decimales
-                progressFill.style.backgroundColor = getTemperatureColor(percentage);
-            }
-
-            // Función para obtener el color según el puntaje
-            function getTemperatureColor(percentage) {
-                if (percentage >= 75) return '#f00'; // Rojo (caliente)
-                if (percentage >= 50) return '#ff0'; // Amarillo
-                if (percentage >= 25) return '#0f0'; // Verde
-                return '#00f'; // Azul (frío)
-            }
-
-            updateProgressBar(0); // Inicializar la barra de temperatura en 0.00
-        });
-    </script>
-</body>
-</html>
+                setTimeout
