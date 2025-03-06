@@ -157,7 +157,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>EL IMPACTOMETRO</h1>
+        <h1>IMPACTOMETRO</h1>
 
         <form id="actionForm">
             <!-- User Identification -->
@@ -170,7 +170,7 @@
 
             <!-- Activity Title -->
             <label for="activityTitle">Título de la Buena Acción:</label>
-            <input type="text" id="activityTitle" name="activityTitle" placeholder="Ingresa un título único"> <!-- ADMIN: EL TÍTULO DEBE INCLUIR LA PALABRA CLAVE SECRETA -->
+            <input type="text" id="activityTitle" name="activityTitle" placeholder="Nombre de la buena acción"> <!-- ADMIN: EL TÍTULO DEBE SER PROGRAMADO POR EL ADMIN -->
 
             <!-- Description -->
             <label for="description">Descripción:</label>
@@ -206,7 +206,8 @@
                 <thead>
                     <tr>
                         <th>User</th>
-                        <th>Impact</th>
+                        <th>Título</th>
+                      <th>Impact</th>
                         <th>Score</th>
                         <th>Verification</th>
                     </tr>
@@ -235,18 +236,39 @@
             const progressIndicator = document.getElementById('progressIndicator');
             const scoreLabel = document.getElementById('scoreLabel');
 
-            // ADMIN: DEFINE AQUÍ LAS PALABRAS CLAVE Y SUS REGLAS DE PUNTUACIÓN
-            const validKeywords = [
+            // ADMIN: DEFINE AQUÍ LAS BUENAS ACCIONES Y SUS REGLAS DE PUNTUACIÓN
+            const validActions = [
                 { 
-                    titleKeyword: "el ping tag", // ADMIN: PALABRA CLAVE SECRETA PARA VALIDAR EL TÍTULO PONER AQUI "TU_PALABRA_CLAVE"
-                    points: {
+                    title: "el ping tag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
+                    pointsConfig: {
                         username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
-                        activityTitle: 0.25, // ADMIN: PUNTOS POR TÍTULO DE LA BUENA ACCIÓN PONER AQUI 0.25
                         descriptionWords: {
-                            minWords: 1, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 1
+                            minWords: 10, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 10
                             pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
                         },
-                        verificationLink: 0.25 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.25
+                        verificationLink: 0.5 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.5
+                    }
+                },
+                { 
+                    title: "El Ping Tag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
+                    pointsConfig: {
+                        username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
+                        descriptionWords: {
+                            minWords: 15, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 15
+                            pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
+                        },
+                        verificationLink: 0.5 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.5
+                    }
+                },
+                { 
+                    title: "elpingtag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
+                    pointsConfig: {
+                        username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
+                        descriptionWords: {
+                            minWords: 5, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 5
+                            pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
+                        },
+                        verificationLink: 0.5 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.5
                     }
                 }
             ];
@@ -270,13 +292,13 @@
                 const description = formData.get('description') || '';
                 const verificationLink = formData.get('verificationLink') || '';
 
-                // Validar palabra específica en el título
-                const matchingKeyword = validKeywords.find(keyword => 
-                    activityTitle.toLowerCase().includes(keyword.titleKeyword.toLowerCase())
+                // Validar si el título es válido y programado por el admin
+                const matchingAction = validActions.find(action => 
+                    activityTitle.toLowerCase().trim() === action.title.toLowerCase().trim()
                 );
 
-                if (!matchingKeyword) {
-                    alert("Tu título debe incluir una palabra secreta válida.");
+                if (!matchingAction) {
+                    alert("El título de la buena acción no es válido. Debe coincidir con uno programado por el administrador.");
                     return;
                 }
 
@@ -292,8 +314,8 @@
                     return;
                 }
 
-                // Calcular puntos basados en la palabra clave
-                const pointsConfig = matchingKeyword.points;
+                // Calcular puntos basados en la buena acción
+                const pointsConfig = matchingAction.pointsConfig;
                 let pointsForAction = 0;
 
                 // Puntos por nombre de usuario
@@ -301,15 +323,13 @@
                     pointsForAction += pointsConfig.username;
                 }
 
-                // Puntos por título de la buena acción
-                if (activityTitle.toLowerCase().includes(pointsConfig.titleKeyword)) {
-                    pointsForAction += pointsConfig.activityTitle;
-                }
-
                 // Puntos por descripción
                 const wordCount = description.trim().split(' ').length;
                 if (wordCount >= pointsConfig.descriptionWords.minWords) {
                     pointsForAction += pointsConfig.descriptionWords.pointsForMinWords;
+                } else {
+                    alert(`Tu descripción debe contener al menos ${pointsConfig.descriptionWords.minWords} palabras.`);
+                    return;
                 }
 
                 // Puntos por enlace de verificación
@@ -324,18 +344,14 @@
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
                     <td>${username}</td>
+                    <td>${activityTitle}</td>
                     <td>${impactStatus}</td>
                     <td>${pointsForAction.toFixed(2)}</td> <!-- Mostrar puntaje con dos decimales -->
                     <td><a href="${verificationLink}" target="_blank">${verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
                 `;
                 document.getElementById('publicScoresTable').appendChild(newRow);
 
-                // Mostrar confeti si alcanza la puntuación máxima de la acción
-                if (pointsForAction === 1) {
-                    showConfetti();
-                }
-
-                // Actualizar la barra de temperatura con el puntaje total del usuario
+                // Actualizar la barra de temperatura con el puntaje obtenido
                 updateProgressBar(pointsForAction);
 
                 // Mostrar mensaje de agradecimiento
@@ -358,7 +374,7 @@
                         usernameCell &&
                         titleCell &&
                         usernameCell.textContent === username &&
-                        titleCell.textContent.toLowerCase().includes(activityTitle.toLowerCase())
+                        titleCell.textContent.toLowerCase().trim() === activityTitle.toLowerCase().trim()
                     ) {
                         return true;
                     }
@@ -370,7 +386,7 @@
             function isVerificationLinkUsed(verificationLink) {
                 const rows = document.querySelectorAll('#publicScoresTable tr');
                 for (const row of rows) {
-                    const linkCell = row.querySelector('td:nth-child(4) a');
+                    const linkCell = row.querySelector('td:nth-child(5) a');
                     if (linkCell && linkCell.href === verificationLink) {
                         return true;
                     }
@@ -394,29 +410,6 @@
                 if (percentage >= 50) return '#ff0'; // Amarillo
                 if (percentage >= 25) return '#0f0'; // Verde
                 return '#00f'; // Azul (frío)
-            }
-
-            // Función para mostrar efecto de confeti
-            function showConfetti() {
-                const confettiContainer = document.createElement('div');
-                confettiContainer.className = 'confetti';
-
-                for (let i = 0; i < 100; i++) {
-                    const piece = document.createElement('div');
-                    piece.className = 'confetti-piece';
-                    piece.style.left = `${Math.random() * 100}vw`;
-                    piece.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-                    piece.style.width = `${Math.random() * 10 + 5}px`;
-                    piece.style.height = `${Math.random() * 10 + 5}px`;
-                    piece.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                    confettiContainer.appendChild(piece);
-                }
-
-                document.body.appendChild(confettiContainer);
-
-                setTimeout(() => {
-                    confettiContainer.remove();
-                }, 5000); // Eliminar confeti después de 5 segundos
             }
 
             updateProgressBar(0); // Inicializar la barra de temperatura en 0.00
