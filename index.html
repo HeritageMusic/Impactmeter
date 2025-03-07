@@ -11,7 +11,7 @@
             padding: 2rem;
             line-height: 1.6;
         }
-        
+
         .deadline-banner {
             background: #fff3cd;
             border: 1px solid #ffeeba;
@@ -281,28 +281,25 @@
             // Actualizar UI
             updateProgress(points);
             updateScoreTable(updatedData);
-            
-          fetch("https://script.google.com/macros/s/AKfycbzTOozlyYAZSOKJLb8jLFhlPNs_4WXJxnHk6wsfQsjbPXRjM4SNJUlOjoiJcKffZD2E7A/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    username: "UsuarioTest",
-    activityTitle: "PING TAG",
-    description: "Descripción de prueba",
-    verificationLink: "https://ejemplo.com",
-    points: "1.00",
-    impactStatus: "Excelente"
-  })
-})
-.then(response => response.json())
-.then(data => console.log("✅ Datos enviados:", data))
-.catch(error => console.error("❌ Error:", error));
 
-
-});
-
+            // Enviar los datos al servidor
+            fetch("https://script.google.com/macros/s/AKfycbzTOozlyYAZSOKJLb8jLFhlPNs_4WXJxnHk6wsfQsjbPXRjM4SNJUlOjoiJcKffZD2E7A/exec", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username,
+                    activityTitle,
+                    description,
+                    verificationLink,
+                    points: points.toFixed(2),
+                    impactStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log("✅ Datos enviados:", data))
+            .catch(error => console.error("❌ Error:", error));
         });
 
         function updateProgress(percentage) {
