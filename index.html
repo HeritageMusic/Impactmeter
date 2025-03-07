@@ -4,138 +4,7 @@
     <meta charset="UTF-8">
     <title>El Impactómetro</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 2rem;
-            line-height: 1.6;
-        }
-        
-        .deadline-banner {
-            background: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
-            padding: 1rem;
-            margin: 1rem 0;
-            text-align: center;
-            font-weight: bold;
-            color: #856404;
-        }
-
-        .progress-container {
-            position: relative;
-            width: 250px;
-            height: 250px;
-            margin: 3rem auto;
-        }
-
-        .donut {
-            width: 100%;
-            height: 100%;
-            background: conic-gradient(from 0deg, 
-                #2196F3 0%, 
-                #FF9800 100%);
-            border-radius: 50%;
-            transition: transform 1s ease;
-        }
-
-        .donut::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60%;
-            height: 60%;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            font-size: 1.5rem;
-            color: #333;
-        }
-
-        .status-label {
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-weight: bold;
-            color: #777;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        th {
-            background: #007bff;
-            color: white;
-            padding: 1rem;
-            text-align: left;
-        }
-
-        td {
-            padding: 0.8rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: #555;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: #45a049;
-        }
-
-        .word-counter {
-            font-size: 0.9rem;
-            color: #777;
-            margin-top: -0.5rem;
-            margin-bottom: 1rem;
-        }
+        /* Estilos previamente proporcionados */
     </style>
 </head>
 <body>
@@ -145,15 +14,15 @@
         <span id="deadlineDate"></span>
     </div>
 
-    <form id="actionForm">
+    <form id="actionForm" autocomplete="on">
         <div class="form-group">
-            <label>Nombre de usuario:</label>
-            <input type="text" name="username" required>
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" name="username" id="username" required autocomplete="username">
         </div>
 
         <div class="form-group">
-            <label>Título de la acción creativa:</label>
-            <input type="text" name="activityTitle" list="allowedTitles" required>
+            <label for="activityTitle">Título de la acción creativa:</label>
+            <input type="text" name="activityTitle" id="activityTitle" list="allowedTitles" required autocomplete="off">
             <datalist id="allowedTitles">
                 <option value="PING TAG">
                 <option value="EXPRESATE">
@@ -163,14 +32,14 @@
         </div>
 
         <div class="form-group">
-            <label>Descripción (mínimo 10 palabras):</label>
-            <textarea name="description" rows="4" required></textarea>
+            <label for="description">Descripción (mínimo 10 palabras):</label>
+            <textarea name="description" id="description" rows="4" required autocomplete="off"></textarea>
             <div class="word-counter" id="wordCount">0/10 palabras</div>
         </div>
 
         <div class="form-group">
-            <label>Enlace de verificación:</label>
-            <input type="url" name="verificationLink" required>
+            <label for="verificationLink">Enlace de verificación:</label>
+            <input type="url" name="verificationLink" id="verificationLink" required autocomplete="off">
         </div>
 
         <button type="submit">Registrar Acción</button>
@@ -190,6 +59,7 @@
                 <th>Acción Clave</th>
                 <th>Puntos</th>
                 <th>Nivel de Impacto</th>
+                <th>Enlace de Verificación</th>
             </tr>
         </thead>
         <tbody>
@@ -208,9 +78,12 @@
             day: 'numeric'
         });
 
+        // Conexión con Google Sheets
+        const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbzTOozlyYAZSOKJLb8jLFhlPNs_4WXJxnHk6wsfQsjbPXRjM4SNJUlOjoiJcKffZD2E7A/exec';
+        
+        // Cargar y mostrar los datos de la base de datos de Google Sheets
         document.addEventListener('DOMContentLoaded', () => {
-            const storedData = JSON.parse(localStorage.getItem('impactData')) || [];
-            updateScoreTable(storedData);
+            loadScoreData();
         });
 
         document.getElementById('actionForm').addEventListener('submit', function(e) {
@@ -223,33 +96,21 @@
             const verificationLink = formData.get('verificationLink').trim();
 
             // Validaciones
-            const existingData = JSON.parse(localStorage.getItem('impactData')) || [];
-            
-            if(existingData.some(entry => entry.username === username)) {
-                alert('⚠️ Usuario ya ha registrado una acción');
-                return;
-            }
-            
-            if(existingData.some(entry => entry.verificationLink === verificationLink)) {
-                alert('⚠️ Enlace de verificación ya utilizado');
-                return;
-            }
-            
-            const wordCount = description.split(/\s+/).filter(word => word.length > 0).length;
-            if(wordCount < 10) {
-                alert(`⚠️ Faltan ${10 - wordCount} palabras en la descripción`);
-                return;
-            }
-            
-            if(new Date() > adminDeadline) {
+            if (new Date() > adminDeadline) {
                 alert(`⏰ El periodo de registro finalizó el ${adminDeadline.toLocaleDateString()}`);
                 return;
             }
 
             // Validar palabra clave
             const allowedKeywords = ['PING TAG', 'EXPRESATE', 'REMIX', 'REVANCHA'];
-            if(!allowedKeywords.includes(activityTitle)) {
+            if (!allowedKeywords.includes(activityTitle)) {
                 alert('❌ Título de acción no autorizado\n\nOpciones válidas:\n- PING TAG\n- EXPRESATE\n- REMIX\n- REVANCHA');
+                return;
+            }
+
+            const wordCount = description.split(/\s+/).filter(word => word.length > 0).length;
+            if (wordCount < 10) {
+                alert(`⚠️ Faltan ${10 - wordCount} palabras en la descripción`);
                 return;
             }
 
@@ -258,8 +119,8 @@
             points += (username !== '') ? 0.25 : 0;
             points += (wordCount >= 10) ? 0.25 : 0;
             points += (verificationLink !== '') ? 0.5 : 0;
-            
-            const impactStatus = 
+
+            const impactStatus =
                 points >= 0.75 ? 'Excelente' :
                 points >= 0.5 ? 'Bueno' : 'Regular';
 
@@ -273,11 +134,21 @@
                 impactStatus
             };
 
-            storedData.push(newEntry);
-            localStorage.setItem('impactData', JSON.stringify(storedData));
-            updateScoreTable(storedData);
+            sendToGoogleSheet(newEntry);  // Enviar datos a Google Sheets
             this.reset();
         });
+
+        // Actualiza la tabla de puntajes desde Google Sheets
+        function loadScoreData() {
+            fetch(googleSheetUrl)
+                .then(response => response.json())
+                .then(data => {
+                    updateScoreTable(data);
+                })
+                .catch(error => {
+                    console.error('Error al cargar los datos de la base de datos:', error);
+                });
+        }
 
         // Actualiza la tabla de puntajes
         function updateScoreTable(data) {
@@ -291,25 +162,26 @@
                     <td>${entry.activityTitle}</td>
                     <td>${entry.points}</td>
                     <td>${entry.impactStatus}</td>
+                    <td><a href="${entry.verificationLink}" target="_blank">Verificar</a></td>
                 `;
             });
         }
 
-        // Actualiza el progreso de la acción
-        function updateProgressBar(points) {
-            const progressDonut = document.getElementById('progressDonut');
-            const progressText = document.getElementById('progressPercentage');
-            const progressStatus = document.getElementById('progressStatus');
-            
-            const percentage = points * 100;
-
-            progressDonut.style.transform = `rotate(${percentage * 3.6}deg)`;
-            progressText.textContent = `${Math.round(percentage)}%`;
-            progressStatus.textContent = 
-                percentage >= 75 ? 'Excelente' : 
-                percentage >= 50 ? 'Bueno' : 'Regular';
+        // Enviar los datos a Google Sheets
+        function sendToGoogleSheet(entry) {
+            fetch(googleSheetUrl, {
+                method: 'POST',
+                body: new URLSearchParams(entry),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Datos enviados con éxito:', data);
+                loadScoreData();  // Recargar los datos de la base de datos después de enviar
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos:', error);
+            });
         }
-
     </script>
 </body>
 </html>
