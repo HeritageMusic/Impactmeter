@@ -11,7 +11,7 @@
             padding: 2rem;
             line-height: 1.6;
         }
-
+        
         .deadline-banner {
             background: #fff3cd;
             border: 1px solid #ffeeba;
@@ -270,78 +270,46 @@
                 description,
                 verificationLink,
                 points: points.toFixed(2),
-                impactStatus,
-                timestamp: new Date().toISOString()
+                impactStatus
             };
 
-            // Actualizar datos
-            const updatedData = [...existingData, newEntry];
-            localStorage.setItem('impactData', JSON.stringify(updatedData));
-            
-            // Actualizar UI
-            updateProgress(points);
-            updateScoreTable(updatedData);
-
-            // Enviar los datos al servidor
-            fetch("https://script.google.com/macros/s/AKfycbzTOozlyYAZSOKJLb8jLFhlPNs_4WXJxnHk6wsfQsjbPXRjM4SNJUlOjoiJcKffZD2E7A/exec", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username,
-                    activityTitle,
-                    description,
-                    verificationLink,
-                    points: points.toFixed(2),
-                    impactStatus
-                })
-            })
-            .then(response => response.json())
-            .then(data => console.log("✅ Datos enviados:", data))
-            .catch(error => console.error("❌ Error:", error));
+            storedData.push(newEntry);
+            localStorage.setItem('impactData', JSON.stringify(storedData));
+            updateScoreTable(storedData);
+            this.reset();
         });
 
-        function updateProgress(percentage) {
-            const donut = document.getElementById('progressDonut');
-            const text = document.getElementById('progressPercentage');
-            const status = document.getElementById('progressStatus');
-            
-            const degrees = percentage * 360;
-            donut.style.background = `conic-gradient(from 0deg, 
-                #2196F3 0%, 
-                #FF9800 ${degrees}deg)`;
-            
-            text.textContent = `${Math.round(percentage * 100)}%`;
-            
-            if(percentage >= 0.75) {
-                status.textContent = 'Excelente';
-                status.style.color = '#FF9800';
-            } else if(percentage >= 0.5) {
-                status.textContent = 'Bueno';
-                status.style.color = '#4CAF50';
-            } else {
-                status.textContent = 'Regular';
-                status.style.color = '#2196F3';
-            }
-        }
-
+        // Actualiza la tabla de puntajes
         function updateScoreTable(data) {
-            const tbody = document.querySelector('#scoreTable tbody');
-            tbody.innerHTML = data.map(entry => `
-                <tr>
+            const tableBody = document.getElementById('scoreTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpia la tabla
+            
+            data.forEach(entry => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
                     <td>${entry.username}</td>
                     <td>${entry.activityTitle}</td>
                     <td>${entry.points}</td>
-                    <td class="${entry.impactStatus.toLowerCase()}">${entry.impactStatus}</td>
-                </tr>
-            `).join('');
+                    <td>${entry.impactStatus}</td>
+                `;
+            });
         }
 
-        document.querySelector('textarea').addEventListener('input', (e) => {
-            const words = e.target.value.trim().split(/\s+/).filter(word => word.length > 0);
-            document.getElementById('wordCount').textContent = `${words.length}/10 palabras`;
-        });
+        // Actualiza el progreso de la acción
+        function updateProgressBar(points) {
+            const progressDonut = document.getElementById('progressDonut');
+            const progressText = document.getElementById('progressPercentage');
+            const progressStatus = document.getElementById('progressStatus');
+            
+            const percentage = points * 100;
+
+            progressDonut.style.transform = `rotate(${percentage * 3.6}deg)`;
+            progressText.textContent = `${Math.round(percentage)}%`;
+            progressStatus.textContent = 
+                percentage >= 75 ? 'Excelente' : 
+                percentage >= 50 ? 'Bueno' : 'Regular';
+        }
+
     </script>
 </body>
 </html>
