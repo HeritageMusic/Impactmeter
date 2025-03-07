@@ -2,422 +2,325 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scoreboard para el Concurso de Remix</title>
+    <title>Impactómetro v2.0</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
         }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        label {
-            margin-bottom: 8px;
-            font-weight: bold;
-            width: 100%;
-            text-align: left;
-        }
-        input[type="text"], input[type="url"], textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        input[type="submit"] {
-            width: 100%;
-            padding: 12px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
+        
+        .progress-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 3rem auto;
         }
 
-        /* Estilo para la barra de temperatura */
-        .progress-bar {
-            margin-top: 20px;
-            position: relative;
+        .donut {
             width: 100%;
-            height: 50px;
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .progress-bar .bar {
             height: 100%;
-            background: linear-gradient(to right, #00f, #0f0, #ff0, #f00); /* Gradiente de colores */
-            border-radius: 25px;
+            background: conic-gradient(from 0deg, 
+                #004e98 0%, 
+                #00bcd4 50%, 
+                #ff5722 100%);
+            border-radius: 50%;
+            transition: transform 1s ease;
         }
-        .progress-bar .fill {
-            height: 100%;
-            background: #f00; /* Color inicial */
-            transition: width 0.3s ease;
-            border-radius: 25px;
-        }
-        .progress-bar .scale {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-        .progress-bar .scale span {
-            position: relative;
-            bottom: -5px; /* Ajuste vertical */
-        }
-        .progress-bar .indicator {
+
+        .donut::before {
+            content: '';
             position: absolute;
-            bottom: -40px; /* Distancia entre el triángulo y la barra */
-            left: 0;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: left 0.3s ease;
-        }
-        .progress-bar .indicator .triangle {
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 12px 12px 12px;
-            border-color: transparent transparent #000 transparent;
-        }
-        .progress-bar .indicator .score-label {
-            margin-top: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Estilo para la tabla pública */
-        .public-scores {
-            margin-top: 100px;
-            width: 100%;
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5rem;
+            color: #333;
         }
+
+        .status-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #666;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            font-size: 14px;
-        }
+
         th {
-            background-color: #f9f9f9;
-            color: #333;
+            background: #007bff;
+            color: white;
+            padding: 1rem;
+            text-align: left;
         }
-        a {
-            color: #007BFF;
-            text-decoration: none;
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: bold;
+            color: #555;
         }
-        a:hover {
-            text-decoration: underline;
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
         }
-        .message {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 16px;
-            color: #333;
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .word-counter {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>IMPACTOMETRO</h1>
-
-        <form id="actionForm">
-            <!-- User Identification -->
-            <label for="username">Nombre de Usuario:</label>
-            <input type="text" id="username" name="username" placeholder="Ingresa tu nombre">
-
-            <!-- Deadline Configurable by Admin -->
-            <label for="deadline">Fecha Límite:</label>
-            <input type="text" id="deadline" value="2025-03-10" readonly style="background-color: #f9f9f9;"> <!-- ADMIN: FECHA LÍMITE DEL PROTOTIPO PONER AQUI "YYYY-MM-DD" -->
-
-            <!-- Activity Title -->
-            <label for="activityTitle">Título de la Buena Acción:</label>
-            <input type="text" id="activityTitle" name="activityTitle" placeholder="Título de la buena acción"> <!-- ADMIN: EL TÍTULO DEBE SER PROGRAMADO POR EL ADMIN -->
-
-            <!-- Description -->
-            <label for="description">Descripción:</label>
-            <textarea id="description" name="description" rows="4" placeholder="Describe lo que has logrado"></textarea>
-
-            <!-- Verification Link -->
-            <label for="verificationLink">Enlace de Verificación (Público):</label>
-            <input type="url" id="verificationLink" name="verificationLink" placeholder="URL de comprobación">
-
-            <!-- Submit Button -->
-            <input type="submit" value="Enviar">
-        </form>
-
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="bar">
-                <div class="fill" id="progressFill" style="width: 0%;"></div>
-            </div>
-            <div class="scale">
-                <span>0.00</span><span style="margin-left: 11%;">0.25</span><span style="margin-left: 11%;">0.50</span>
-                <span style="margin-left: 11%;">0.75</span><span style="margin-left: 11%;">1.00</span>
-            </div>
-            <div class="indicator" id="progressIndicator" style="left: 0;">
-                <div class="triangle"></div>
-                <div class="score-label" id="scoreLabel">0.00</div> <!-- Mostrar puntaje inicial -->
-            </div>
+    <h1>Registro de Buenas Acciones</h1>
+    
+    <form id="actionForm">
+        <div class="form-group">
+            <label>Nombre de usuario:</label>
+            <input type="text" name="username" required>
         </div>
 
-        <!-- Public Scores Table -->
-        <div class="public-scores">
-            <h2>Puntuaciones Públicas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Título</th>
-                        <th>Impact</th>
-                        <th>Score</th>
-                        <th>Verification</th>
-                    </tr>
-                </thead>
-                <tbody id="publicScoresTable">
-                    <!-- Scores will be dynamically added here -->
-                </tbody>
-            </table>
+        <div class="form-group">
+            <label>Título de la buena acción (palabra clave):</label>
+            <input type="text" name="activityTitle" list="allowedTitles" required>
+            <datalist id="allowedTitles">
+                <option value="ECO-RETO">
+                <option value="DONA-VIDA">
+                <option value="ADOPTA-ARBOL">
+                <option value="EDU-VERDE">
+            </datalist>
         </div>
 
-        <!-- Message after submission -->
-        <div class="message" id="thankYouMessage" style="display: none;">
-            ¡Gracias por tus buenas acciones! Tu progreso se ha actualizado.
+        <div class="form-group">
+            <label>Descripción (mínimo 10 palabras):</label>
+            <textarea name="description" rows="4" required></textarea>
+            <div class="word-counter" id="wordCount">0/10 palabras</div>
         </div>
+
+        <div class="form-group">
+            <label>Enlace de verificación:</label>
+            <input type="url" name="verificationLink" required>
+        </div>
+
+        <button type="submit">Registrar Acción</button>
+    </form>
+
+    <div class="progress-container">
+        <div class="donut" id="progressDonut"></div>
+        <div class="progress-text" id="progressPercentage">0%</div>
+        <div class="status-label" id="progressStatus">Regular</div>
     </div>
 
+    <h2>Tabla de Impacto Social</h2>
+    <table id="scoreTable">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Acción Clave</th>
+                <th>Puntos</th>
+                <th>Nivel de Impacto</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const actionForm = document.getElementById('actionForm');
-            if (!actionForm) {
-                console.error("El formulario con ID 'actionForm' no fue encontrado en el DOM.");
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedData = JSON.parse(localStorage.getItem('impactData')) || [];
+            updateScoreTable(storedData);
+        });
+
+        document.getElementById('actionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const username = formData.get('username').trim();
+            const activityTitle = formData.get('activityTitle').trim().toUpperCase();
+            const description = formData.get('description').trim();
+            const verificationLink = formData.get('verificationLink').trim();
+
+            // Validaciones
+            const existingData = JSON.parse(localStorage.getItem('impactData')) || [];
+            
+            if(existingData.some(entry => entry.username === username)) {
+                alert('⚠️ Usuario ya ha registrado una acción');
+                return;
+            }
+            
+            if(existingData.some(entry => entry.verificationLink === verificationLink)) {
+                alert('⚠️ Enlace de verificación ya utilizado');
+                return;
+            }
+            
+            const wordCount = description.split(/\s+/).filter(word => word.length > 0).length;
+            if(wordCount < 10) {
+                alert(`⚠️ Faltan ${10 - wordCount} palabras en la descripción`);
+                return;
+            }
+            
+            const deadline = new Date('2024-12-31T23:59:59');
+            if(new Date() > deadline) {
+                alert('📅 Periodo de registro finalizado');
                 return;
             }
 
-            const progressFill = document.getElementById('progressFill');
-            const progressIndicator = document.getElementById('progressIndicator');
-            const scoreLabel = document.getElementById('scoreLabel');
-
-            // ADMIN: DEFINE AQUÍ LAS BUENAS ACCIONES Y SUS REGLAS DE PUNTUACIÓN
-            const validActions = [
-                { 
-                    title: "el ping tag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
-                    pointsConfig: {
-                        username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
-                        descriptionWords: {
-                            minWords: 10, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 10
-                            pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
-                        },
-                        verificationLink: 0.5 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.5
-                    }
-                },
-                { 
-                    title: "el ping tag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
-                    pointsConfig: {
-                        username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
-                        descriptionWords: {
-                            minWords: 15, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 15
-                            pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
-                        },
-                        verificationLink: 0.5 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.5
-                    }
-                },
-                { 
-                    title: "elpingtag", // ADMIN: TÍTULO ÚNICO DE LA BUENA ACCIÓN PONER AQUI "TU_TITULO"
-                    pointsConfig: {
-                        username: 0.25, // ADMIN: PUNTOS POR NOMBRE DE USUARIO PONER AQUI 0.25
-                        descriptionWords: {
-                            minWords: 5, // ADMIN: NÚMERO MÍNIMO DE PALABRAS EN LA DESCRIPCIÓN PONER AQUI 5
-                            pointsForMinWords: 0.25, // ADMIN: PUNTOS SI HAY MÁS DE MINWORDS PONER AQUI 0.25
-                        },
-                        verificationLink: 0.5 // ADMIN: PUNTOS POR ENLACE DE VERIFICACIÓN PONER AQUI 0.5
-                    }
-                }
-            ];
-
-            // Cargar puntuaciones públicas desde localStorage
-            function loadPublicScores() {
-                const savedScores = JSON.parse(localStorage.getItem('publicScores')) || [];
-                const publicScoresTable = document.getElementById('publicScoresTable');
-                publicScoresTable.innerHTML = ''; // Limpiar la tabla antes de cargar los datos
-
-                savedScores.forEach(score => {
-                    const newRow = document.createElement('tr');
-                    newRow.innerHTML = `
-                        <td>${score.username}</td>
-                        <td>${score.activityTitle}</td>
-                        <td>${score.impactStatus}</td>
-                        <td>${score.points.toFixed(2)}</td>
-                        <td><a href="${score.verificationLink}" target="_blank">${score.verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
-                    `;
-                    publicScoresTable.appendChild(newRow);
-                });
+            // Validar palabra clave
+            const allowedKeywords = ['ECO-RETO', 'DONA-VIDA', 'ADOPTA-ARBOL', 'EDU-VERDE'];
+            if(!allowedKeywords.includes(activityTitle)) {
+                alert('❌ Título de acción no autorizado');
+                return;
             }
 
-            // Guardar puntuaciones públicas en localStorage
-            function savePublicScores(scores) {
-                localStorage.setItem('publicScores', JSON.stringify(scores));
+            // Calcular puntos
+            let points = 0;
+            points += (username !== '') ? 0.25 : 0;
+            points += (wordCount >= 10) ? 0.25 : 0;
+            points += (verificationLink !== '') ? 0.5 : 0;
+            
+            const impactStatus = 
+                points >= 0.75 ? 'Excelente' :
+                points >= 0.5 ? 'Bueno' : 'Regular';
+
+            // Crear registro
+            const newEntry = {
+                username,
+                activityTitle,
+                description,
+                verificationLink,
+                points: points.toFixed(2),
+                impactStatus,
+                timestamp: new Date().toISOString()
+            };
+
+            // Actualizar datos
+            const updatedData = [...existingData, newEntry];
+            localStorage.setItem('impactData', JSON.stringify(updatedData));
+            
+            // Actualizar UI
+            updateProgress(points);
+            updateScoreTable(updatedData);
+            
+            // Enviar a Google Sheets
+            fetch('https://script.google.com/macros/s/AKfycbwA-xv2JqedfDcsWOn-DpIVYv35bjoQkTH1VnsfcaWWZEdC88sKfiaqHp67sC-lq8Fk/exec', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newEntry)
+            })
+            .then(response => {
+                if(response.ok) {
+                    this.reset();
+                    alert('✅ ¡Acción registrada exitosamente!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Error al registrar acción');
+            });
+        });
+
+        function updateProgress(percentage) {
+            const donut = document.getElementById('progressDonut');
+            const text = document.getElementById('progressPercentage');
+            const status = document.getElementById('progressStatus');
+            
+            const degrees = percentage * 360;
+            donut.style.background = `conic-gradient(from 0deg, 
+                #004e98 0%, 
+                #00bcd4 ${degrees/2}deg, 
+                #ff5722 ${degrees}deg)`;
+            
+            text.textContent = `${Math.round(percentage * 100)}%`;
+            
+            if(percentage >= 0.75) {
+                status.textContent = 'Excelente';
+                status.style.color = '#ff5722';
+            } else if(percentage >= 0.5) {
+                status.textContent = 'Bueno';
+                status.style.color = '#00bcd4';
+            } else {
+                status.textContent = 'Regular';
+                status.style.color = '#004e98';
             }
+        }
 
-            // Obtener todas las puntuaciones públicas actuales
-            function getPublicScores() {
-                return JSON.parse(localStorage.getItem('publicScores')) || [];
-            }
+        function updateScoreTable(data) {
+            const tbody = document.querySelector('#scoreTable tbody');
+            tbody.innerHTML = data.map(entry => `
+                <tr>
+                    <td>${entry.username}</td>
+                    <td>${entry.activityTitle}</td>
+                    <td>${entry.points}</td>
+                    <td class="${entry.impactStatus.toLowerCase()}">${entry.impactStatus}</td>
+                </tr>
+            `).join('');
+        }
 
-            // Verificar si un usuario ya ha enviado una buena acción específica
-            function isUserActionAlreadySubmitted(username, activityTitle) {
-                const scores = getPublicScores();
-                return scores.some(score => 
-                    score.username.toLowerCase().trim() === username.toLowerCase().trim() &&
-                    score.activityTitle.toLowerCase().trim() === activityTitle.toLowerCase().trim()
-                );
-            }
-
-            // Verificar si un enlace de verificación ya existe en cualquier registro
-            function isVerificationLinkUsed(verificationLink) {
-                const scores = getPublicScores();
-                return scores.some(score => score.verificationLink === verificationLink);
-            }
-
-            loadPublicScores(); // Cargar puntuaciones al iniciar la aplicación
-
-            actionForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const deadlineInput = document.getElementById('deadline');
-                const deadlineStr = deadlineInput.value || "2023-03-10"; // ADMIN: FECHA LÍMITE DEL PROTOTIPO PONER AQUI "YYYY-MM-DD"
-                const deadlineDate = new Date(deadlineStr);
-
-                const currentDate = new Date();
-                if (currentDate > deadlineDate) {
-                    alert("La fecha límite ha expirado. No puedes enviar más acciones.");
-                    return;
-                }
-
-                const formData = new FormData(this);
-                const username = formData.get('username') || 'Anónimo';
-                const activityTitle = formData.get('activityTitle') || '';
-                const description = formData.get('description') || '';
-                const verificationLink = formData.get('verificationLink') || '';
-
-                // Validar si el título es válido y programado por el admin
-                const matchingAction = validActions.find(action => 
-                    activityTitle.toLowerCase().trim() === action.title.toLowerCase().trim()
-                );
-
-                if (!matchingAction) {
-                    alert("El título de la buena acción no es válido. Debe coincidir con uno programado por el administrador.");
-                    return;
-                }
-
-                // Verificar si el usuario ya ha enviado esta buena acción
-                if (isUserActionAlreadySubmitted(username, activityTitle)) {
-                    alert("Ya has enviado esta buena acción. No puedes enviarla nuevamente.");
-                    return;
-                }
-
-                // Verificar si el enlace de verificación ya existe en cualquier registro
-                if (isVerificationLinkUsed(verificationLink)) {
-                    alert("Este enlace de verificación ya ha sido registrado. Debes proporcionar uno diferente.");
-                    return;
-                }
-
-                // Calcular puntos basados en la buena acción
-                const pointsConfig = matchingAction.pointsConfig;
-                let pointsForAction = 0;
-
-                // Puntos por nombre de usuario
-                if (username.trim() !== '') {
-                    pointsForAction += pointsConfig.username;
-                }
-
-                // Puntos por descripción
-                const wordCount = description.trim().split(' ').length;
-                if (wordCount >= pointsConfig.descriptionWords.minWords) {
-                    pointsForAction += pointsConfig.descriptionWords.pointsForMinWords;
-                } else {
-                    alert(`Tu descripción debe contener al menos ${pointsConfig.descriptionWords.minWords} palabras.`);
-                    return;
-                }
-
-                // Puntos por enlace de verificación
-                if (verificationLink.trim() !== '') {
-                    pointsForAction += pointsConfig.verificationLink;
-                }
-
-                // Determinar el estado (Impact)
-                const impactStatus = pointsForAction === 1 ? "Excelente" : pointsForAction >= 0.75 ? "Muy Bueno" : pointsForAction >= 0.5 ? "Bueno" : "Pobre";
-
-                // Crear nueva fila en la tabla de puntuaciones públicas
-                const newRow = {
-                    username,
-                    activityTitle,
-                    impactStatus,
-                    points: pointsForAction.toFixed(2),
-                    verificationLink
-                };
-
-                // Guardar la nueva puntuación en localStorage
-                const publicScores = getPublicScores();
-                publicScores.push(newRow);
-                savePublicScores(publicScores);
-
-                // Actualizar la tabla pública
-                const publicScoresTable = document.getElementById('publicScoresTable');
-                const rowElement = document.createElement('tr');
-                rowElement.innerHTML = `
-                    <td>${newRow.username}</td>
-                    <td>${newRow.activityTitle}</td>
-                    <td>${newRow.impactStatus}</td>
-                    <td>${newRow.points}</td>
-                    <td><a href="${newRow.verificationLink}" target="_blank">${newRow.verificationLink ? 'Verificar' : 'Sin Enlace'}</a></td>
-                `;
-                publicScoresTable.appendChild(rowElement);
-
-                // Mostrar confeti si alcanza la puntuación máxima de la acción
-                if (pointsForAction === 1) {
-                    showConfetti();
-                }
-
-                // Mostrar mensaje de agradecimiento
-                const thankYouMessage = document.getElementById('thankYouMessage');
-                thankYouMessage.style.display = 'block';
-                setTimeout
+        document.querySelector('textarea').addEventListener('input', (e) => {
+            const words = e.target.value.trim().split(/\s+/).filter(word => word.length > 0);
+            document.getElementById('wordCount').textContent = `${words.length}/10 palabras`;
+        });
+    </script>
+</body>
+</html>
