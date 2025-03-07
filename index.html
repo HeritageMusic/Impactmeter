@@ -10,6 +10,7 @@
             margin: 0 auto;
             padding: 2rem;
             line-height: 1.6;
+            background-color: #f9f9f9;
         }
 
         .deadline-banner {
@@ -21,6 +22,7 @@
             text-align: center;
             font-weight: bold;
             color: #856404;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .progress-container {
@@ -113,6 +115,12 @@
             border-radius: 4px;
             font-size: 1rem;
             margin-bottom: 0.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #007bff;
+            outline: none;
         }
 
         button {
@@ -136,10 +144,36 @@
             margin-top: -0.5rem;
             margin-bottom: 1rem;
         }
+
+        .impact-meter {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .impact-meter h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .impact-meter .meter-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .impact-meter .meter-fill {
+            height: 100%;
+            background: linear-gradient(to right, #2196F3, #FF9800);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
 <body>
-    <h1>EL IMPACTOMETRO</h1>
+    <h1>EL IMPACTÓMETRO</h1>
     <div class="deadline-banner">
         ⏰ Fecha límite de registro: 
         <span id="deadlineDate"></span>
@@ -182,6 +216,13 @@
         <div class="status-label" id="progressStatus">Regular</div>
     </div>
 
+    <div class="impact-meter">
+        <h2>Nivel de Impacto General</h2>
+        <div class="meter-bar">
+            <div class="meter-fill" id="impactMeterFill"></div>
+        </div>
+    </div>
+
     <h2>Tabla de Impacto Social</h2>
     <table id="scoreTable">
         <thead>
@@ -213,6 +254,7 @@
                 .then(response => response.json())
                 .then(data => {
                     updateScoreTable(data);
+                    updateImpactMeter(data);
                 })
                 .catch(error => console.error('Error al cargar los datos:', error));
         });
@@ -275,6 +317,7 @@
                 alert('Registro exitoso!');
                 // Actualizar tabla
                 updateScoreTable([newEntry, ...data]);
+                updateImpactMeter([newEntry, ...data]);
             }).catch(error => {
                 console.error('Error al enviar datos:', error);
                 alert('❌ No se pudo registrar la acción');
@@ -297,6 +340,21 @@
                 tableBody.appendChild(row);
             });
         }
+
+        // Actualizar el medidor de impacto general
+        function updateImpactMeter(data) {
+            const totalPoints = data.reduce((sum, entry) => sum + parseFloat(entry.points), 0);
+            const maxPoints = data.length * 1; // Máximo 1 punto por entrada
+            const percentage = (totalPoints / maxPoints) * 100;
+
+            document.getElementById('impactMeterFill').style.width = `${percentage}%`;
+        }
+
+        // Contador de palabras en tiempo real
+        document.querySelector('textarea[name="description"]').addEventListener('input', function() {
+            const wordCount = this.value.split(/\s+/).filter(word => word.length > 0).length;
+            document.getElementById('wordCount').textContent = `${wordCount}/10 palabras`;
+        });
     </script>
 </body>
 </html>
