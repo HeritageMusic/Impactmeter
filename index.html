@@ -282,28 +282,24 @@
             updateProgress(points);
             updateScoreTable(updatedData);
             
-            fetch('https://script.google.com/macros/s/AKfycbzTOozlyYAZSOKJLb8jLFhlPNs_4WXJxnHk6wsfQsjbPXRjM4SNJUlOjoiJcKffZD2E7A/exec', {
-    method: 'POST',
+            fetch("NUEVA_URL_DE_TU_GOOGLE_SCRIPT", {
+    method: "POST",
     headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        username: "usuario123",
+        username: "UsuarioTest",
         activityTitle: "PING TAG",
-        description: "Descripción larga de la actividad...",
-        verificationLink: "http://verificacion.com",
-        points: 10,
+        description: "Descripción de prueba",
+        verificationLink: "https://ejemplo.com",
+        points: "1.00",
         impactStatus: "Excelente"
     })
 })
 .then(response => response.json())
-.then(data => {
-    console.log('✅ Respuesta:', data);
-    alert('✅ Acción registrada exitosamente.');
-})
-.catch(error => {
-    console.error('❌ Error al registrar acción:', error);
-    alert('❌ Error al registrar acción.');
+.then(data => console.log("✅ Datos enviados:", data))
+.catch(error => console.error("❌ Error:", error));
+
 });
 
         });
