@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Impactómetro v2.0</title>
+    <title>El Impactómetro</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,6 +12,17 @@
             line-height: 1.6;
         }
         
+        .deadline-banner {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: bold;
+            color: #856404;
+        }
+
         .progress-container {
             position: relative;
             width: 250px;
@@ -23,9 +34,8 @@
             width: 100%;
             height: 100%;
             background: conic-gradient(from 0deg, 
-                #004e98 0%, 
-                #00bcd4 50%, 
-                #ff5722 100%);
+                #2196F3 0%, 
+                #FF9800 100%);
             border-radius: 50%;
             transition: transform 1s ease;
         }
@@ -59,7 +69,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-weight: bold;
-            color: #666;
+            color: #777;
         }
 
         table {
@@ -85,10 +95,6 @@
             background: #f8f9fa;
         }
 
-        .hidden {
-            display: none;
-        }
-
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -110,7 +116,7 @@
         }
 
         button {
-            background: #28a745;
+            background: #4CAF50;
             color: white;
             border: none;
             padding: 1rem 2rem;
@@ -121,20 +127,24 @@
         }
 
         button:hover {
-            background: #218838;
+            background: #45a049;
         }
 
         .word-counter {
             font-size: 0.9rem;
-            color: #666;
+            color: #777;
             margin-top: -0.5rem;
             margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-    <h1>Registro de Buenas Acciones</h1>
-    
+    <h1>EL IMPACTOMETRO</h1>
+    <div class="deadline-banner">
+        ⏰ Fecha límite de registro: 
+        <span id="deadlineDate"></span>
+    </div>
+
     <form id="actionForm">
         <div class="form-group">
             <label>Nombre de usuario:</label>
@@ -142,12 +152,12 @@
         </div>
 
         <div class="form-group">
-            <label>Título de la buena acción (palabra clave):</label>
+            <label>Título de la acción creativa:</label>
             <input type="text" name="activityTitle" list="allowedTitles" required>
             <datalist id="allowedTitles">
                 <option value="PING TAG">
                 <option value="EXPRESATE">
-                <option value="MI REMIX">
+                <option value="REMIX">
                 <option value="REVANCHA">
             </datalist>
         </div>
@@ -187,6 +197,17 @@
     </table>
 
     <script>
+        // Configuración ADMIN - Modificar aquí 👇
+        const adminDeadline = new Date('2025-03-10T23:59:59'); // Fecha límite
+        
+        // Mostrar fecha formateada
+        document.getElementById('deadlineDate').textContent = adminDeadline.toLocaleDateString('es-ES', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             const storedData = JSON.parse(localStorage.getItem('impactData')) || [];
             updateScoreTable(storedData);
@@ -220,16 +241,15 @@
                 return;
             }
             
-            const deadline = new Date('2024-12-31T23:59:59');
-            if(new Date() > deadline) {
-                alert('📅 Periodo de registro finalizado');
+            if(new Date() > adminDeadline) {
+                alert(`⏰ El periodo de registro finalizó el ${adminDeadline.toLocaleDateString()}`);
                 return;
             }
 
             // Validar palabra clave
-            const allowedKeywords = ['PING TAG', 'EXPRESATE', 'MI REMIX', 'REVANCHA'];
+            const allowedKeywords = ['PING TAG', 'EXPRESATE', 'REMIX', 'REVANCHA'];
             if(!allowedKeywords.includes(activityTitle)) {
-                alert('❌ Título de acción no autorizado');
+                alert('❌ Título de acción no autorizado\n\nOpciones válidas:\n- PING TAG\n- EXPRESATE\n- REMIX\n- REVANCHA');
                 return;
             }
 
@@ -287,21 +307,20 @@
             
             const degrees = percentage * 360;
             donut.style.background = `conic-gradient(from 0deg, 
-                #004e98 0%, 
-                #00bcd4 ${degrees/2}deg, 
-                #ff5722 ${degrees}deg)`;
+                #2196F3 0%, 
+                #FF9800 ${degrees}deg)`;
             
             text.textContent = `${Math.round(percentage * 100)}%`;
             
             if(percentage >= 0.75) {
                 status.textContent = 'Excelente';
-                status.style.color = '#ff5722';
+                status.style.color = '#FF9800';
             } else if(percentage >= 0.5) {
                 status.textContent = 'Bueno';
-                status.style.color = '#00bcd4';
+                status.style.color = '#4CAF50';
             } else {
                 status.textContent = 'Regular';
-                status.style.color = '#004e98';
+                status.style.color = '#2196F3';
             }
         }
 
