@@ -145,10 +145,10 @@
             <label>Título de la buena acción (palabra clave):</label>
             <input type="text" name="activityTitle" list="allowedTitles" required>
             <datalist id="allowedTitles">
-                <option value="ECO-RETO">
-                <option value="DONA-VIDA">
-                <option value="ADOPTA-ARBOL">
-                <option value="EDU-VERDE">
+                <option value="PING TAG">
+                <option value="EXPRESATE">
+                <option value="MI REMIX">
+                <option value="REVANCHA">
             </datalist>
         </div>
 
@@ -227,7 +227,7 @@
             }
 
             // Validar palabra clave
-            const allowedKeywords = ['ECO-RETO', 'DONA-VIDA', 'ADOPTA-ARBOL', 'EDU-VERDE'];
+            const allowedKeywords = ['PING TAG', 'EXPRESATE', 'MI REMIX', 'REVANCHA'];
             if(!allowedKeywords.includes(activityTitle)) {
                 alert('❌ Título de acción no autorizado');
                 return;
