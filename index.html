@@ -282,23 +282,24 @@
             updateProgress(points);
             updateScoreTable(updatedData);
             
-            fetch("NUEVA_URL_DE_TU_GOOGLE_SCRIPT", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        username: "UsuarioTest",
-        activityTitle: "PING TAG",
-        description: "Descripción de prueba",
-        verificationLink: "https://ejemplo.com",
-        points: "1.00",
-        impactStatus: "Excelente"
-    })
+          fetch("https://script.google.com/macros/s/AKfycbzTOozlyYAZSOKJLb8jLFhlPNs_4WXJxnHk6wsfQsjbPXRjM4SNJUlOjoiJcKffZD2E7A/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    username: "UsuarioTest",
+    activityTitle: "PING TAG",
+    description: "Descripción de prueba",
+    verificationLink: "https://ejemplo.com",
+    points: "1.00",
+    impactStatus: "Excelente"
+  })
 })
 .then(response => response.json())
 .then(data => console.log("✅ Datos enviados:", data))
 .catch(error => console.error("❌ Error:", error));
+
 
 });
 
