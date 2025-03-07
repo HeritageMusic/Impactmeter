@@ -282,22 +282,30 @@
             updateProgress(points);
             updateScoreTable(updatedData);
             
-            // Enviar a Google Sheets
             fetch('https://script.google.com/macros/s/AKfycbwA-xv2JqedfDcsWOn-DpIVYv35bjoQkTH1VnsfcaWWZEdC88sKfiaqHp67sC-lq8Fk/exec', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newEntry)
-            })
-            .then(response => {
-                if(response.ok) {
-                    this.reset();
-                    alert('✅ ¡Acción registrada exitosamente!');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('❌ Error al registrar acción');
-            });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        username: "usuario123",
+        activityTitle: "PING TAG",
+        description: "Descripción larga de la actividad...",
+        verificationLink: "http://verificacion.com",
+        points: 10,
+        impactStatus: "Excelente"
+    })
+})
+.then(response => response.json())
+.then(data => {
+    console.log('✅ Respuesta:', data);
+    alert('✅ Acción registrada exitosamente.');
+})
+.catch(error => {
+    console.error('❌ Error al registrar acción:', error);
+    alert('❌ Error al registrar acción.');
+});
+
         });
 
         function updateProgress(percentage) {
